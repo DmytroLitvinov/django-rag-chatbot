@@ -24,6 +24,7 @@ FIRST_PARTY_APPS = [
     'server.apps.main',
     'server.apps.core',
     'server.apps.chatbot',
+    'server.apps.documents',
 ]
 
 INSTALLED_APPS: tuple[str, ...] = (
@@ -34,6 +35,7 @@ INSTALLED_APPS: tuple[str, ...] = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     # django-admin:
     'django.contrib.admin',
     'django.contrib.admindocs',
@@ -52,6 +54,21 @@ INSTALLED_APPS: tuple[str, ...] = (
     # django-simple-history
     # https://github.com/jazzband/django-simple-history
     'simple_history',
+    # django-allauth-ui
+    # https://github.com/danihodovic/django-allauth-ui
+    'allauth_ui',
+    # django-allauth
+    # https://docs.allauth.org/en/latest/index.html
+    'allauth',
+    'allauth.account',
+    # django-widget-tweaks
+    # https://github.com/jazzband/django-widget-tweaks
+    'widget_tweaks',
+    # https://github.com/mixxorz/slippers
+    'slippers',
+    # django-ai-assistant
+    # https://django-ai.com/latest/get-started/
+    'django_ai_assistant',
 )
 
 MIDDLEWARE: tuple[str, ...] = (
@@ -74,6 +91,8 @@ MIDDLEWARE: tuple[str, ...] = (
     'axes.middleware.AxesMiddleware',
     # django-currentuser:
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
+    # django-allauth
+    'allauth.account.middleware.AccountMiddleware',
 )
 
 ROOT_URLCONF = 'server.urls'
@@ -144,7 +163,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             # Contains plain text templates, like `robots.txt`:
-            BASE_DIR.joinpath('server', 'common', 'django', 'templates'),
+            BASE_DIR.joinpath('server', 'templates'),
         ],
         'OPTIONS': {
             'context_processors': [
@@ -177,7 +196,10 @@ AUTH_USER_MODEL = 'users.User'
 
 AUTHENTICATION_BACKENDS = (
     'axes.backends.AxesBackend',
+    # Needed to login by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 PASSWORD_HASHERS = [
@@ -209,3 +231,18 @@ PERMISSIONS_POLICY: dict[str, str | list[str]] = {}
 # https://docs.djangoproject.com/en/5.2/ref/settings/#std:setting-EMAIL_TIMEOUT
 
 EMAIL_TIMEOUT = 5
+
+# django-tasks
+TASKS = {
+    'default': {'BACKEND': 'django_tasks.backends.immediate.ImmediateBackend'}
+}
+
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = 'account_login'
+LOGOUT_REDIRECT_URL = '/'
+
+# django-allauth-ui
+ALLAUTH_UI_THEME = 'light'
+
+# django-allauth
+ACCOUNT_SIGNUP_FIELDS = ['username*', 'password1*', 'password2*']

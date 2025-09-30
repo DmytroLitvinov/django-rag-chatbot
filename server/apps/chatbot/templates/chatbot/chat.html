@@ -45,7 +45,7 @@
                     <div class="d-flex justify-content-end mb-3 fade-in">
                         <div class="message-bubble user-message rounded-3 px-3 py-2">
                             <div class="mb-1">{{ formatted_content|safe }}</div>
-                            <small class="opacity-75">{{ message.timestamp|date:"g:i A" }}</small>
+                            <small class="opacity-75">{{ message.created_at|date:"g:i A" }}</small>
                         </div>
                     </div>
                 {% else %}
@@ -57,7 +57,7 @@
                         </div>
                         <div class="message-bubble ai-message rounded-3 px-3 py-2">
                             <div class="mb-1 markdown-content">{{ formatted_content|safe }}</div>
-                            <small class="text-muted">{{ message.timestamp|date:"g:i A" }} • Gemma 3 4B</small>
+                            <small class="text-muted">{{ message.created_at|date:"g:i A" }} • Gemma 3 4B</small>
                         </div>
                     </div>
                 {% endif %}
@@ -154,7 +154,7 @@
                     contentDiv.textContent = aiContent;
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 } else if (data.type === 'done') {
-                    timestampDiv.innerHTML = data.timestamp + ' • Gemma 3 4B';
+                    timestampDiv.innerHTML = data.created_at + ' • Gemma 3 4B';
                     eventSource.close();
                     // Convert markdown to HTML
                     fetch('/chat/{{ conversation.id }}/render-markdown/', {

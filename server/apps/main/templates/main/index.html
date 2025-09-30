@@ -19,8 +19,18 @@
           href="{% static 'main/images/favicon-32x32.png' %}" />
   </head>
   <body>
-    <div class="wemake-services-body" data-testid="wemake-django-template">
+  <div class="wemake-services-body" data-testid="wemake-django-template">
+    {% if user.is_authenticated %}
       <h1>Go to <a href="{% url 'homepage' %}">Chatbot</a></h1>
-    </div>
+    {% else %}
+      <h1>Welcome!</h1>
+      <p>You need to log in or create an account before using the platform.</p>
+      <p>
+        <a href="{% url 'account_login' %}" class="btn btn-primary">Log In</a>
+        or
+        <a href="{% url 'account_signup' %}" class="btn btn-secondary">Create Account</a>
+      </p>
+    {% endif %}
+  </div>
   </body>
 </html>

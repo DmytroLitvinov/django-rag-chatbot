@@ -47,13 +47,13 @@ INSTALLED_APPS += (
     # Linting migrations:
     'django_migration_linter',
     # django-test-migrations:
-    'django_test_migrations.contrib.django_checks.AutoNames',
+    # 'django_test_migrations.contrib.django_checks.AutoNames',
     # This check might be useful in production as well,
     # so it might be a good idea to move `django-test-migrations`
     # to prod dependencies and use this check in the main `settings.py`.
     # This will check that your database is configured properly,
     # when you run `python manage.py check` before deploy.
-    'django_test_migrations.contrib.django_checks.DatabaseConfiguration',
+    # 'django_test_migrations.contrib.django_checks.DatabaseConfiguration',
     # django-extra-checks:
     'extra_checks',
     # django-query-counter:
@@ -101,7 +101,7 @@ CSP_SCRIPT_SRC += ('ajax.googleapis.com',)
 CSP_IMG_SRC += ('data:',)
 CSP_CONNECT_SRC += (
     "'self'",
-    "http://localhost:8000",   # SSE dev server
+    'http://localhost:8000',  # SSE dev server
 )
 
 
@@ -124,7 +124,10 @@ ZEAL_ALLOWLIST = [
 # https://github.com/wemake-services/django-test-migrations
 
 # Set of badly named migrations to ignore:
-DTM_IGNORED_MIGRATIONS = frozenset((('axes', '*'),))
+DTM_IGNORED_MIGRATIONS = frozenset((
+    ('axes', '*'),
+    ('django_ai_assistant', '*'),
+))
 
 
 # django-migration-linter

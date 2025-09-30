@@ -1,35 +1,43 @@
 from django.contrib import admin
+
 from server.apps.chatbot.models import Message
 from server.apps.core.admin import BaseModelAdmin
 
 
 @admin.register(Message)
 class MessageAdmin(BaseModelAdmin):
-    list_display = ("conversation_title", "sender", "content_preview", "timestamp")
-    list_filter = ("is_user", "timestamp", "conversation")
-    search_fields = ("content", "conversation__title")
-    readonly_fields = ("timestamp",)
-    ordering = ("-timestamp",)
+    list_display = (
+        'conversation_title',
+        'sender',
+        'content_preview',
+        'created_at',
+    )
+    list_filter = ('is_user', 'created_at', 'conversation')
+    search_fields = ('content', 'conversation__title')
+    ordering = ('-created_at',)
 
+    @admin.display(
+        description='Conversation',
+        ordering='conversation__title',
+    )
     def conversation_title(self, obj):
         return obj.conversation.title
 
-    conversation_title.short_description = "Conversation"
-    conversation_title.admin_order_field = "conversation__title"
-
+    @admin.display(
+        description='Sender',
+        ordering='is_user',
+    )
     def sender(self, obj):
-        return "User" if obj.is_user else "Gemma 3 4B"
+        return 'User' if obj.is_user else 'Gemma 3 4B'
 
-    sender.short_description = "Sender"
-    sender.admin_order_field = "is_user"
-
+    @admin.display(description='Content')
     def content_preview(self, obj):
-        return obj.content[:100] + "..." if len(obj.content) > 100 else obj.content
-
-    content_preview.short_description = "Content"
+        return (
+            obj.content[:100] + '...' if len(obj.content) > 100 else obj.content
+        )
 
     # Custom fieldsets for better organization
     fieldsets = (
-        (None, {"fields": ("conversation", "is_user", "content")}),
-        ("Timestamps", {"fields": ("timestamp",), "classes": ("collapse",)}),
+        (None, {'fields': ('conversation', 'is_user', 'content')}),
+        ('Timestamps', {'fields': ('created_at',), 'classes': ('collapse',)}),
     )

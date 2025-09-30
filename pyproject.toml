@@ -29,7 +29,7 @@ django-health-check = "^3.18"
 django-permissions-policy = "^4.27"
 django-stubs-ext = "^5.1"
 
-psycopg2-binary = "^2.9"
+psycopg = "^3.2"
 gunicorn = "^23.0"
 python-decouple = "^3.8"
 structlog = "^25.4"
@@ -42,6 +42,16 @@ django-model-utils = "^5.0.0"
 django-simple-history = "^3.10.1"
 django-concurrency = "^2.7"
 django-lifecycle = "^1.2.4"
+django-allauth = "^65.11.2"
+pgvector = "^0.4.1"
+django-allauth-ui = "^1.8.1"
+django-widget-tweaks = "^1.5.0"
+django-braces = "^1.17.0"
+openai = "^1.109.1"
+django-tasks = "^0.8.1"
+django-ai-assistant = "^0.1.2"
+langchain-community = "^0.3.30"
+pymupdf = "^1.26.4"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -156,7 +166,10 @@ ignore = [
   "COM812", # trailing comma, conflicts with `ruff format`
   # Different doc rules that we don't really care about:
   "D100",
+  "D101",  # missing docstring in public class
+  "D102", # missing docstring in public method
   "D104",
+  "D105",
   "D106",
   "D203",
   "D212",

@@ -2,6 +2,10 @@
 
 Django RAG Chatbot
 
+RAG or Retrieval-Augmented Generation, is an innovative approach that extends Large Language Models’ capabilities by
+embedding information retrieval mechanisms into the process of generation.
+This provides LLMs with an opportunity to refer to knowledge bases for better performance in terms of relevance and accuracy.
+
 This project was generated with [`wemake-django-template`](https://github.com/wemake-services/wemake-django-template). Current template version is: [aa80689](https://github.com/wemake-services/wemake-django-template/tree/aa806899238345d6bb9d05aa0c13cc2d14463a51). See what is [updated](https://github.com/wemake-services/wemake-django-template/compare/aa806899238345d6bb9d05aa0c13cc2d14463a51...master) since then.
 
 

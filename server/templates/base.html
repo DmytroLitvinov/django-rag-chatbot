@@ -1,0 +1,134 @@
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemma 3:4B Chat</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    {% include 'partials/_base_head_style.html' %}
+</head>
+<body>
+{% block content %}
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn d-md-none" onclick="toggleSidebar()">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" onclick="document.querySelector('input[name=message]').focus()">
+                <i class="bi bi-plus me-2"></i>New Chat
+            </button>
+        </div>
+
+        {% if recent_conversations %}
+          <div>
+              <h6 class="text-muted mb-3" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Recent RAG Chats</h6>
+              {% for conversation in recent_documents_conversations %}
+                  <a href="{% url 'chat' conversation.id %}" class="recent-chat-item">
+                      <div class="recent-chat-title">{{ conversation.title }}</div>
+                      <div class="recent-chat-date">{{ conversation.modified_at|date:"M j" }}</div>
+                  </a>
+              {% empty %}
+                <p class="text-secondary">{% translate 'No yet conversations' %}</p>
+              {% endfor %}
+
+          </div>
+        {% endif %}
+
+        {% if recent_conversations %}
+          <div>
+              <h6 class="text-muted mb-3" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Recent Chats</h6>
+              {% for conversation in recent_conversations %}
+                  <a href="{% url 'chat' conversation.id %}" class="recent-chat-item">
+                      <div class="recent-chat-title">{{ conversation.title }}</div>
+                      <div class="recent-chat-date">{{ conversation.modified_at|date:"M j" }}</div>
+                  </a>
+              {% empty %}
+                <p class="text-secondary">{% translate 'No yet conversations' %}</p>
+              {% endfor %}
+          </div>
+        {% endif %}
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <div class="logo-icon">
+                    <i class="bi bi-robot"></i>
+                </div>
+                Gemma 3 4B
+            </h1>
+            <p class="hero-subtitle">
+                Chat with your local AI model. Fast, private, and powerful.
+            </p>
+
+            <div class="chat-input-container">
+                <form method="post" action="{% url 'homepage' %}">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text"
+                               name="message"
+                               class="form-control chat-input"
+                               placeholder="Ask Gemma anything..."
+                               required
+                               autocomplete="off"
+                               autofocus>
+                        <button type="submit" class="btn send-button">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="features">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="feature-item">
+                                <i class="bi bi-shield-check feature-icon"></i>
+                                <span>Private & Secure</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item">
+                                <i class="bi bi-lightning feature-icon"></i>
+                                <span>Fast Response</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item">
+                                <i class="bi bi-cpu feature-icon"></i>
+                                <span>Local Processing</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+
+            if (window.innerWidth <= 768 &&
+                !sidebar.contains(event.target) &&
+                !menuBtn.contains(event.target)) {
+                sidebar.classList.remove('show');
+            }
+        });
+    </script>
+{% endblock content %}
+</body>
+</html>

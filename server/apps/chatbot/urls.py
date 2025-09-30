@@ -1,19 +1,20 @@
 from django.urls import path
 
-from . import views
-from .views_stream import StreamChatView, RenderMarkdownView
+from .logic.chat import ChatView
+from .logic.homepage import HomepageView
+from .views_stream import RenderMarkdownView, StreamChatView
 
 urlpatterns = [
-    path("", views.HomepageView.as_view(), name="homepage"),
-    path("<int:conversation_id>/", views.ChatView.as_view(), name="chat"),
+    path('', HomepageView.as_view(), name='homepage'),
+    path('<int:conversation_id>/', ChatView.as_view(), name='chat'),
     path(
-        "<int:conversation_id>/stream/",
+        '<int:conversation_id>/stream/',
         StreamChatView.as_view(),
-        name="stream_chat",
+        name='stream_chat',
     ),
     path(
-        "<int:conversation_id>/render-markdown/",
+        '<int:conversation_id>/render-markdown/',
         RenderMarkdownView.as_view(),
-        name="render_markdown",
+        name='render_markdown',
     ),
 ]

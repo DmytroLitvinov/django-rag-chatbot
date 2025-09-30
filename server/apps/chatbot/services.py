@@ -1,18 +1,19 @@
 """Service layer for business logic"""
 
-import httpx
 import json
 
-from .models import Conversation, Message
+import httpx
+
 from .constants import (
-    OLLAMA_CHAT_ENDPOINT,
-    OLLAMA_MODEL,
-    OLLAMA_TIMEOUT,
-    OLLAMA_STREAM_TIMEOUT,
     CONVERSATION_CONTEXT_LIMIT,
     ERROR_MESSAGES,
+    OLLAMA_CHAT_ENDPOINT,
+    OLLAMA_MODEL,
+    OLLAMA_STREAM_TIMEOUT,
+    OLLAMA_TIMEOUT,
 )
 from .exceptions import OllamaConnectionError, OllamaResponseError
+from .models import Conversation, Message
 
 
 class OllamaService:
@@ -22,10 +23,7 @@ class OllamaService:
     def format_messages(conversation, limit=CONVERSATION_CONTEXT_LIMIT):
         """Format conversation messages for Ollama API"""
         messages = conversation.get_context_messages(limit)
-        return [
-            {"role": msg.role, "content": msg.content}
-            for msg in messages
-        ]
+        return [{'role': msg.role, 'content': msg.content} for msg in messages]
 
     @staticmethod
     async def get_completion(messages):
@@ -35,67 +33,81 @@ class OllamaService:
                 response = await client.post(
                     OLLAMA_CHAT_ENDPOINT,
                     json={
-                        "model": OLLAMA_MODEL,
-                        "messages": messages,
-                        "stream": False,
+                        'model': OLLAMA_MODEL,
+                        'messages': messages,
+                        'stream': False,
                     },
                 )
 
                 if response.status_code != 200:
-                    raise OllamaResponseError(ERROR_MESSAGES["OLLAMA_ERROR"])
+                    raise OllamaResponseError(ERROR_MESSAGES['OLLAMA_ERROR'])
 
                 data = response.json()
-                return data.get("message", {}).get("content", "")
+                return data.get('message', {}).get('content', '')
 
             except httpx.ConnectError as e:
-                raise OllamaConnectionError(f"{ERROR_MESSAGES['OLLAMA_CONNECTION']}: {str(e)}")
+                raise OllamaConnectionError(
+                    f'{ERROR_MESSAGES["OLLAMA_CONNECTION"]}: {e!s}'
+                )
             except httpx.TimeoutException:
-                raise OllamaConnectionError("Request to Ollama timed out")
+                raise OllamaConnectionError('Request to Ollama timed out')
             except Exception as e:
-                raise OllamaResponseError(f"Unexpected error: {str(e)}")
+                raise OllamaResponseError(f'Unexpected error: {e!s}')
 
     @staticmethod
     def stream_completion(messages):
         """Stream a completion from Ollama"""
 
         def generate():
-            full_response = ""
+            full_response = ''
 
             try:
                 with httpx.Client(timeout=OLLAMA_STREAM_TIMEOUT) as client:
                     with client.stream(
-                        "POST",
+                        'POST',
                         OLLAMA_CHAT_ENDPOINT,
                         json={
-                            "model": OLLAMA_MODEL,
-                            "messages": messages,
-                            "stream": True,
+                            'model': OLLAMA_MODEL,
+                            'messages': messages,
+                            'stream': True,
                         },
                     ) as response:
                         for line in response.iter_lines():
                             if line:
                                 try:
                                     data = json.loads(line)
-                                    if "message" in data and "content" in data["message"]:
-                                        token = data["message"]["content"]
+                                    if (
+                                        'message' in data
+                                        and 'content' in data['message']
+                                    ):
+                                        token = data['message']['content']
                                         full_response += token
-                                        yield json.dumps({'type': 'token', 'content': token})
+                                        yield json.dumps({
+                                            'type': 'token',
+                                            'content': token,
+                                        })
                                 except json.JSONDecodeError:
                                     continue
                                 except Exception as e:
-                                    yield json.dumps({'type': 'error', 'content': f'Parse error: {str(e)}'})
+                                    yield json.dumps({
+                                        'type': 'error',
+                                        'content': f'Parse error: {e!s}',
+                                    })
             except Exception as e:
-                yield json.dumps({'type': 'error', 'content': f'Connection error: {str(e)}'})
+                yield json.dumps({
+                    'type': 'error',
+                    'content': f'Connection error: {e!s}',
+                })
                 return
 
             # Return the complete response for saving
             if full_response:
-                yield json.dumps({
-                    'type': 'complete',
-                    'content': full_response
-                })
+                yield json.dumps({'type': 'complete', 'content': full_response})
             else:
-                yield json.dumps({'type': 'error', 'content': ERROR_MESSAGES['NO_RESPONSE']})
+                yield json.dumps({
+                    'type': 'error',
+                    'content': ERROR_MESSAGES['NO_RESPONSE'],
+                })
 
         return generate
 
@@ -113,8 +125,9 @@ class ConversationService:
         """Add a user message to a conversation"""
         return Message.objects.create(
             conversation=conversation,
+            user=conversation.user,
             content=content,
-            is_user=True
+            is_user=True,
         )
 
     @staticmethod
@@ -122,10 +135,11 @@ class ConversationService:
         """Add an AI message to a conversation"""
         message = Message.objects.create(
             conversation=conversation,
+            user=conversation.user,
             content=content,
-            is_user=False
+            is_user=False,
         )
-        # Update conversation's updated_at
+        # Update conversation's modified_at
         conversation.save()
         return message
 

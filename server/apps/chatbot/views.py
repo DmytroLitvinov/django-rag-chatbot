@@ -142,6 +142,7 @@ class ChatView(DetailView):
 
             <!-- SSE Script for Streaming -->
             <script>
+                (function() {{
                 const eventSource = new EventSource('/chat/{conversation.id}/stream/?message_id={user_message.id}');
                 let aiContent = '';
                 const contentDiv = document.getElementById('ai-content-{user_message.id}');
@@ -185,6 +186,7 @@ class ChatView(DetailView):
                     eventSource.close();
                     contentDiv.innerHTML = '<em>Error: Connection lost. Check console for details.</em>';
                 }};
+                }})();
             </script>
         """
         )

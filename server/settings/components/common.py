@@ -18,10 +18,16 @@ from server.settings.components import BASE_DIR, config
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # Application definition:
+FIRST_PARTY_APPS = [
+    # Your apps go here:
+    'server.apps.users',
+    'server.apps.main',
+    'server.apps.core',
+    'server.apps.chatbot',
+]
 
 INSTALLED_APPS: tuple[str, ...] = (
-    # Your apps go here:
-    'server.apps.main',
+    *FIRST_PARTY_APPS,
     # Default django apps:
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,6 +46,12 @@ INSTALLED_APPS: tuple[str, ...] = (
     'health_check.db',
     'health_check.cache',
     'health_check.storage',
+    # Django Extensions
+    # https://django-extensions.readthedocs.io/
+    'django_extensions',
+    # django-simple-history
+    # https://github.com/jazzband/django-simple-history
+    'simple_history',
 )
 
 MIDDLEWARE: tuple[str, ...] = (
@@ -60,6 +72,8 @@ MIDDLEWARE: tuple[str, ...] = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Axes:
     'axes.middleware.AxesMiddleware',
+    # django-currentuser:
+    'django_currentuser.middleware.ThreadLocalUserMiddleware',
 )
 
 ROOT_URLCONF = 'server.urls'
@@ -158,6 +172,8 @@ MEDIA_ROOT = BASE_DIR.joinpath('media')
 
 # Django authentication system
 # https://docs.djangoproject.com/en/5.2/topics/auth/
+
+AUTH_USER_MODEL = 'users.User'
 
 AUTHENTICATION_BACKENDS = (
     'axes.backends.AxesBackend',

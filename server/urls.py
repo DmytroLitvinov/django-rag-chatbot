@@ -22,6 +22,7 @@ from server.apps.main.views import index
 admin.autodiscover()
 
 urlpatterns = [
+    path('chat/', include('server.apps.chatbot.urls')),
     # Apps:
     path('main/', include(main_urls, namespace='main')),
     # Health checks:

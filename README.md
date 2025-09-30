@@ -30,3 +30,8 @@ When developing locally, we use:
 ## Documentation
 
 Full documentation is available here: [`docs/`](docs).
+
+
+## Run project
+
+Run `make up` to start the project. Then open http://localhost:8000 in your browser.

@@ -99,7 +99,10 @@ DEBUG_TOOLBAR_CONFIG = {
 # since `ddt` loads some scripts from `ajax.googleapis.com`:
 CSP_SCRIPT_SRC += ('ajax.googleapis.com',)
 CSP_IMG_SRC += ('data:',)
-CSP_CONNECT_SRC += ("'self'",)
+CSP_CONNECT_SRC += (
+    "'self'",
+    "http://localhost:8000",   # SSE dev server
+)
 
 
 # django-zeal

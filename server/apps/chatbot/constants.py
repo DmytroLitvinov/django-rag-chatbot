@@ -1,7 +1,9 @@
 """Constants and configuration for the chatbot application"""
 
 # Ollama API Configuration
-OLLAMA_BASE_URL = "http://localhost:11434"
+# Since we run in Docker env and Ollama is on the host machine,
+# we use host.docker.internal to access the host from the container.
+OLLAMA_BASE_URL = "http://host.docker.internal:11434"
 OLLAMA_CHAT_ENDPOINT = f"{OLLAMA_BASE_URL}/api/chat"
 OLLAMA_MODEL = "gemma3:4b"
 OLLAMA_TIMEOUT = 60.0  # seconds

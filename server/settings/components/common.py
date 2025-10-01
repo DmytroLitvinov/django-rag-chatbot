@@ -69,6 +69,10 @@ INSTALLED_APPS: tuple[str, ...] = (
     # django-ai-assistant
     # https://django-ai.com/latest/get-started/
     'django_ai_assistant',
+    # https://github.com/adamchainz/django-watchfiles
+    'django_watchfiles',
+    # https://github.com/adamchainz/django-browser-reload
+    'django_browser_reload',
 )
 
 MIDDLEWARE: tuple[str, ...] = (
@@ -91,8 +95,10 @@ MIDDLEWARE: tuple[str, ...] = (
     'axes.middleware.AxesMiddleware',
     # django-currentuser:
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
-    # django-allauth
+    # django-allauth:
     'allauth.account.middleware.AccountMiddleware',
+    # django-browser-reload:
+    'django_browser_reload.middleware.BrowserReloadMiddleware',
 )
 
 ROOT_URLCONF = 'server.urls'

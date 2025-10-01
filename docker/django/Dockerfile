@@ -2,7 +2,8 @@
 # This Dockerfile uses multi-stage build to customize DEV and PROD images:
 # https://docs.docker.com/develop/develop-images/multistage-build/
 
-FROM python:3.12.11-slim-bookworm AS development_build
+FROM docker.io/python:3.13.7-slim-bookworm as development_build
+COPY --from=ghcr.io/astral-sh/uv:0.8.17 /uv /uvx /bin/
 
 LABEL maintainer="myapp.com"
 LABEL vendor="myapp.com"
@@ -24,13 +25,23 @@ ENV DJANGO_ENV=${DJANGO_ENV} \
   PIP_DISABLE_PIP_VERSION_CHECK=1 \
   PIP_DEFAULT_TIMEOUT=100 \
   PIP_ROOT_USER_ACTION=ignore \
+  # uv:
+  # https://rob.cogit8.org/posts/optimizing-django-docker-builds-with-astrals-uv/
+  # Enable bytecode compilation
+  UV_COMPILE_BYTECODE=1 \
+  # Copy from the cache instead of linking since it's a mounted volume
+  UV_LINK_MODE=copy \
+  UV_CACHE_DIR=/app/.cache/uv \
+  # Prevents uv from trying to manage Python installations. In Docker container, we already have Python installed
+  # and don’t want uv attempting to download or manage different Python versions.
+  UV_NO_MANAGED_PYTHON=1 \
+  # https://github.com/astral-sh/uv/pull/6834#issuecomment-2319253359
+  # # Use the system Python environment
+  UV_PROJECT_ENVIRONMENT="/usr/local/" \
+  # Whether uv should allow Python downloads
+  UV_PYTHON_DOWNLOADS=never \
   # tini:
-  TINI_VERSION=v0.19.0 \
-  # poetry:
-  POETRY_VERSION=2.1.4 \
-  POETRY_VIRTUALENVS_CREATE=false \
-  POETRY_CACHE_DIR='/var/cache/pypoetry' \
-  POETRY_HOME='/usr/local'
+  TINI_VERSION=v0.19.0
 
 SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 
@@ -45,7 +56,15 @@ RUN apt-get update && apt-get upgrade -y \
     curl \
     gettext \
     git \
+    # For pycairo:
     libpq-dev \
+    xorg-dev \
+    libxcursor-dev \
+    libxrandr-dev \
+    libxinerama-dev \
+    mesa-common-dev  \
+    libgl1-mesa-dev  \
+    libglu1-mesa-dev \
   # Installing `tini` utility:
   # https://github.com/krallin/tini
   # Get architecture to download appropriate tini release:
@@ -53,10 +72,6 @@ RUN apt-get update && apt-get upgrade -y \
   && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
   && curl -o /usr/local/bin/tini -sSLO "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-${dpkgArch}" \
   && chmod +x /usr/local/bin/tini && tini --version \
-  # Installing `poetry` package manager:
-  # https://github.com/python-poetry/poetry
-  && curl -sSL 'https://install.python-poetry.org' | python - \
-  && poetry --version \
   # Cleaning cache:
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && apt-get clean -y && rm -rf /var/lib/apt/lists/*
@@ -71,16 +86,14 @@ RUN groupadd -g "${GID}" -r web \
   && chown web:web '/var/www/django/static' '/var/www/django/media'
 
 # Copy only requirements, to cache them in docker layer:
-COPY --chown=web:web ./poetry.lock ./pyproject.toml /code/
+COPY --chown=web:web ./uv.lock ./pyproject.toml /code/
 
 # Project initialization:
 # hadolint ignore=SC2046
-RUN --mount=type=cache,target="$POETRY_CACHE_DIR" \
+RUN --mount=type=cache,target=/app/.cache/uv \
   echo "$DJANGO_ENV" \
-  && poetry --version && poetry run pip --version \
-  && poetry sync \
-    $(if [ "$DJANGO_ENV" = 'production' ]; then echo '--only main'; fi) \
-    --no-interaction --no-ansi
+  && uv --version \
+  && uv sync --locked
 
 # This is a special case. We need to run this script as an entry point:
 COPY ./docker/django/entrypoint.sh /docker-entrypoint.sh

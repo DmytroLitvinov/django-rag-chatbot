@@ -227,6 +227,9 @@
     <button class="new-chat-btn" onclick="document.querySelector('input[name=message]').focus()">
       <i class="bi bi-plus me-2"></i>New Chat
     </button>
+    <a href="{% url 'document_list' %}" class="btn btn-sm btn-outline-secondary w-100 mt-2">
+      <i class="bi bi-folder2-open"></i> Documents
+    </a>
   </div>
 
   {% if recent_conversations %}

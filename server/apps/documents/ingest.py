@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.utils import timezone
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import PyMuPDFLoader
+from langchain_community.document_loaders import PyPDFLoader
 
 from server.apps.documents import configuration
 from server.apps.documents.choices import DocumentStatusChoices
@@ -10,15 +10,17 @@ from server.apps.documents.models import Document, DocumentChunk
 
 
 def ingest_document(document_id: int):
+    """Ingest a document by loading, splitting, embedding, and saving chunks."""
     doc = Document.objects.get(pk=document_id)
     doc.status = DocumentStatusChoices.PROCESSING
     doc.save(update_fields=['status'])
 
     # 1) Load pages
-    loader = PyMuPDFLoader(doc.file.path)
+    loader = PyPDFLoader(doc.file.path)
     raw_docs = loader.load()  # returns list of LangChain Document objects
 
-    # 2) Split into chunks (recursive handles sentences/paragraphs intelligently)
+    # 2) Split into chunks
+    # (recursive handles sentences/paragraphs intelligently)
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=configuration.RAG['CHUNK_SIZE'],
         chunk_overlap=configuration.RAG['CHUNK_OVERLAP'],

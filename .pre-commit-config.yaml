@@ -4,6 +4,15 @@ default_language_version:
    python: python3.12
 
 repos:
+  - repo: https://github.com/ewjoachim/sync-pre-commit-with-uv
+    rev: 1.1.0
+    hooks:
+      - id: sync
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    # uv version.
+    rev: 0.8.14
+    hooks:
+      - id: uv-lock
   - repo: https://github.com/adamchainz/django-upgrade
     rev: 1.27.0
     hooks:

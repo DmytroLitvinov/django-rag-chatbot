@@ -53,6 +53,8 @@ if settings.DEBUG:  # pragma: no cover
     from django.conf.urls.static import static
 
     urlpatterns = [
+        # URLs specific only to django-browser-reload:
+        path('__reload__/', include('django_browser_reload.urls')),
         # URLs specific only to django-debug-toolbar:
         path('__debug__/', include(debug_toolbar.urls)),
         *urlpatterns,
